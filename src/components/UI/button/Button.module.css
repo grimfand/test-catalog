@@ -1,9 +1,10 @@
 .button {
+	height: 2rem;
 	padding: 0.2rem 0.5rem;
 	background-color: blueviolet;
 	border: 1px solid blueviolet;
 	border: 0px;
-	border-radius: 1rem;
+	border-radius: 0.5rem;
 	cursor: pointer;
 	color: white;
 }
