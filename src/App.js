@@ -7,6 +7,7 @@ import Button from './components/UI/button/Button'
 export default function App() {
 	const [products, setProducts] = useState([])
 	const [searchQuery, setSearchQuery] = useState('')
+	const [loading, setLoading] = useState(true)
 
 	const searchedProducts = useMemo(() => {
 		return products.filter(p =>
@@ -14,15 +15,21 @@ export default function App() {
 		)
 	}, [searchQuery, products])
 
-	async function fetchProducts() {
-		let response = await fetch(
-			`${process.env.REACT_APP_BASE_URL}?page=1&limit=10`
-		)
-		const data = await response.json()
-		return data
-	}
-
 	useEffect(() => {
+		async function fetchProducts() {
+			try {
+				const response = await fetch(
+					`${process.env.REACT_APP_BASE_URL}?page=1&limit=10`
+				)
+				const data = await response.json()
+				return data
+			} catch (error) {
+				console.log(error)
+				setLoading(false)
+			} finally {
+				setLoading(false)
+			}
+		}
 		fetchProducts().then(data => setProducts(data))
 	}, [])
 
@@ -62,8 +69,8 @@ export default function App() {
 				<Button>Add New Product</Button>
 			</div>
 
+			{loading && <p>Loading Products...</p>}
 			<ProductList products={searchedProducts} remove={removeProduct} />
-
 			<ProductForm add={addProduct} />
 		</div>
 	)
