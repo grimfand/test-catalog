@@ -8,6 +8,7 @@ export default function App() {
 	const [products, setProducts] = useState([])
 	const [searchQuery, setSearchQuery] = useState('')
 	const [loading, setLoading] = useState(true)
+	const [error, setError] = useState(null)
 
 	const searchedProducts = useMemo(() => {
 		return products.filter(p =>
@@ -21,16 +22,23 @@ export default function App() {
 				const response = await fetch(
 					`${process.env.REACT_APP_BASE_URL}?page=1&limit=10`
 				)
+
+				if (!response.ok) {
+					throw new Error('Something wrong')
+				}
+
 				const data = await response.json()
-				return data
+				setProducts(data)
+				setLoading(false)
 			} catch (error) {
 				console.log(error)
+				setError(error.message)
 				setLoading(false)
 			} finally {
 				setLoading(false)
 			}
 		}
-		fetchProducts().then(data => setProducts(data))
+		fetchProducts()
 	}, [])
 
 	function addProduct(product) {
@@ -69,7 +77,7 @@ export default function App() {
 				<Button>Add New Product</Button>
 			</div>
 
-			{loading && <p>Loading Products...</p>}
+			{loading ? <p>Loading Products...</p> : error && <p>{error}</p>}
 			<ProductList products={searchedProducts} remove={removeProduct} />
 			<ProductForm add={addProduct} />
 		</div>
