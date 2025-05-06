@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import ProductList from './components/ProductList'
 import ProductForm from './components/ProductForm'
+import Input from './components/UI/input/Input'
 
 export default function App() {
 	const [products, setProducts] = useState([
@@ -8,6 +9,13 @@ export default function App() {
 		{ id: 2, name: 'Name', description: 'Descr', price: 500 },
 		{ id: 3, name: 'Name', description: 'Descr', price: 500 },
 	])
+	const [searchQuery, setSearchQuery] = useState('')
+
+	const searchedProducts = useMemo(() => {
+		return products.filter(p =>
+			p.name.toLowerCase().includes(searchQuery.toLowerCase())
+		)
+	}, [searchQuery])
 
 	// async function fetchProducts() {
 	// 	let response = await fetch(
@@ -29,12 +37,19 @@ export default function App() {
 	return (
 		<>
 			{/* <button onClick={fetchProducts}>Load products</button> */}
-			<h1>Catalog:</h1>
 
 			{products.length === 0 ? (
 				<p>No products</p>
 			) : (
-				<ProductList products={products} remove={removeProduct} />
+				<div style={{ display: 'flex', gap: '1rem', flexDirection: 'column' }}>
+					<Input
+						type='text'
+						placeholder='Search...'
+						value={searchQuery}
+						onChange={e => setSearchQuery(e.target.value)}
+					/>
+					<ProductList products={searchedProducts} remove={removeProduct} />
+				</div>
 			)}
 
 			<h2>Add new Product:</h2>
