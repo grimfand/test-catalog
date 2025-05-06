@@ -7,7 +7,7 @@ import Button from './components/UI/button/Button'
 export default function App() {
 	const [products, setProducts] = useState([])
 	const [searchQuery, setSearchQuery] = useState('')
-	const [loading, setLoading] = useState(true)
+	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState(null)
 
 	const searchedProducts = useMemo(() => {
@@ -17,6 +17,7 @@ export default function App() {
 	}, [searchQuery, products])
 
 	useEffect(() => {
+		setLoading(true)
 		async function fetchProducts() {
 			try {
 				const response = await fetch(
@@ -24,7 +25,7 @@ export default function App() {
 				)
 
 				if (!response.ok) {
-					throw new Error('Something wrong')
+					throw new Error('Failed to fetch data')
 				}
 
 				const data = await response.json()
@@ -76,8 +77,9 @@ export default function App() {
 				/>
 				<Button>Add New Product</Button>
 			</div>
+			{loading && <p>Loading Products...</p>}
+			{error && <p>{error}</p>}
 
-			{loading ? <p>Loading Products...</p> : error && <p>{error}</p>}
 			<ProductList products={searchedProducts} remove={removeProduct} />
 			<ProductForm add={addProduct} />
 		</div>
