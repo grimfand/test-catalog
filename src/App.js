@@ -1,30 +1,30 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import ProductList from './components/ProductList'
 import ProductForm from './components/ProductForm'
 import Input from './components/UI/input/Input'
+import Button from './components/UI/button/Button'
 
 export default function App() {
-	const [products, setProducts] = useState([
-		{ id: 1, name: 'Name', description: 'Descr', price: 500 },
-		{ id: 2, name: 'Name', description: 'Descr', price: 500 },
-		{ id: 3, name: 'Name', description: 'Descr', price: 500 },
-	])
+	const [products, setProducts] = useState([])
 	const [searchQuery, setSearchQuery] = useState('')
 
 	const searchedProducts = useMemo(() => {
 		return products.filter(p =>
 			p.name.toLowerCase().includes(searchQuery.toLowerCase())
 		)
-	}, [searchQuery])
+	}, [searchQuery, products])
 
-	// async function fetchProducts() {
-	// 	let response = await fetch(
-	// 		'https://6818644b5a4b07b9d1ceddd8.mockapi.io/api/v1/products'
-	// 	)
-	// 	const data = await response.json()
-	// 	console.log(data)
-	// 	return data
-	// }
+	async function fetchProducts() {
+		let response = await fetch(
+			`${process.env.REACT_APP_BASE_URL}?page=1&limit=10`
+		)
+		const data = await response.json()
+		return data
+	}
+
+	useEffect(() => {
+		fetchProducts().then(data => setProducts(data))
+	}, [])
 
 	function addProduct(product) {
 		setProducts([...products, product])
@@ -35,25 +35,36 @@ export default function App() {
 	}
 
 	return (
-		<>
-			{/* <button onClick={fetchProducts}>Load products</button> */}
+		<div
+			style={{
+				display: 'flex',
+				flexDirection: 'column',
+				alignItems: 'center',
+				width: '100%',
+			}}
+		>
+			<div
+				style={{
+					display: 'flex',
+					alignItems: 'center',
+					width: '100%',
+					gap: '0.5rem',
+					marginBottom: '1rem',
+				}}
+			>
+				<Input
+					type='text'
+					placeholder='Search...'
+					value={searchQuery}
+					onChange={e => setSearchQuery(e.target.value)}
+					style={{ width: '300px' }}
+				/>
+				<Button>Add New Product</Button>
+			</div>
 
-			{products.length === 0 ? (
-				<p>No products</p>
-			) : (
-				<div style={{ display: 'flex', gap: '1rem', flexDirection: 'column' }}>
-					<Input
-						type='text'
-						placeholder='Search...'
-						value={searchQuery}
-						onChange={e => setSearchQuery(e.target.value)}
-					/>
-					<ProductList products={searchedProducts} remove={removeProduct} />
-				</div>
-			)}
+			<ProductList products={searchedProducts} remove={removeProduct} />
 
-			<h2>Add new Product:</h2>
 			<ProductForm add={addProduct} />
-		</>
+		</div>
 	)
 }
