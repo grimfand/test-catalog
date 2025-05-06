@@ -22,11 +22,20 @@ export default function App() {
 		setProducts([...products, product])
 	}
 
+	function removeProduct(product) {
+		setProducts(products.filter(p => p.id !== product.id))
+	}
+
 	return (
 		<>
 			{/* <button onClick={fetchProducts}>Load products</button> */}
 			<h1>Catalog:</h1>
-			<ProductList products={products} />
+
+			{products.length === 0 ? (
+				<p>No products</p>
+			) : (
+				<ProductList products={products} remove={removeProduct} />
+			)}
 
 			<h2>Add new Product:</h2>
 			<ProductForm add={addProduct} />

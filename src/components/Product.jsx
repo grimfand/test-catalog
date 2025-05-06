@@ -1,5 +1,6 @@
 import React from 'react'
 import styles from './Product.module.css'
+import Button from './UI/button/Button'
 
 export default function Product(props) {
 	return (
@@ -10,6 +11,7 @@ export default function Product(props) {
 			<span>{props.product.price}</span>
 			{/* <span>{rating}</span> */}
 			{/* <span>{createdAt}</span> */}
+			<Button onClick={() => props.remove(props.product)}>Delete</Button>
 		</div>
 	)
 }
