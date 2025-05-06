@@ -6,11 +6,15 @@ export default function Product(props) {
 	return (
 		<div className={styles.product}>
 			<h2>{props.product.name}</h2>
-			{/* <img src='' alt='Image'></img> */}
+			<img
+				src={props.product.image}
+				alt={props.product.name}
+				className={styles.productImage}
+			/>
 			<p>{props.product.description}</p>
-			<span>{props.product.price}</span>
-			{/* <span>{rating}</span> */}
-			{/* <span>{createdAt}</span> */}
+			<span>Price: {props.product.price}</span>
+			<span>Rating: {props.product.rating}</span>
+			<span>{props.product.createdAt}</span>
 			<Button onClick={() => props.remove(props.product)}>Delete</Button>
 		</div>
 	)
