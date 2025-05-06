@@ -1,0 +1,15 @@
+.product {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	border: 1px solid rgb(209, 209, 209);
+	border-radius: 2rem;
+	padding: 1rem;
+	box-shadow: 4px 4px 8px 0px rgba(0, 0, 0, 0.204);
+}
+
+.product h2 {
+	font-weight: bold;
+	font-size: 1.2rem;
+	margin: 0;
+}
