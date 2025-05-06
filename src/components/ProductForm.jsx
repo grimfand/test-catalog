@@ -17,7 +17,7 @@ export default function ProductForm({ add }) {
 	}
 
 	return (
-		<form>
+		<form style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
 			<Input
 				type='text'
 				placeholder='Name'
