@@ -1,70 +1,147 @@
-# Getting Started with Create React App
+# 🧪 Тестовое задание: Каталог товаров
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 📌 Цель
 
-## Available Scripts
+Создать одностраничное приложение "Каталог товаров" с возможностью просмотра, добавления, редактирования, удаления и поиска товаров. Данные получаются с удалённого API. Поддерживается пагинация и подгрузка товаров при прокрутке страницы.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 📦 API
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+**Базовый адрес (BASE_URL):**  
+`https://6818644b5a4b07b9d1ceddd8.mockapi.io/api/v1/products`
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+**Схема товара**
 
-### `npm test`
+```typescript
+interface Product {
+	id: string
+	name: string
+	description: string
+	price: string // Например "155.15"
+	image: string // Например "https://loremflickr.com/1681/2604?lock=2080500794434420"
+	createdAt: string // В формате ISO 8601, например "2025-05-04T08:36:19.833Z"
+	/**
+	 * Рейтинг приходит числом от 0 до 100
+	 * Отображать рейтинг необходимо по 10-бальной системе, поэтому нужно обработать значение следующим образом:
+	 * полученное значение разделить на 10 и округлить до ближайшего целого числа в большую сторону
+	 */
+	rating: number
+}
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+**Параметры запроса:**
 
-### `npm run build`
+- Получение товаров
+  - Варианты запросов
+    - Все товары `GET <BASE_URL>`
+    - Пагинация: `GET <BASE_URL>?page=1&limit=10`
+    - Поиск по имени: `GET <BASE_URL>?name=SomeProductName`
+  - Ответ: `Product[]`
+- Редактирование товара
+  - Запрос
+    - **URL** `PUT <BASE_URL>/{productId}`
+    - **Body**. В тело запроса можно отправить любой набор полей из `Product`. Перезапишутся только те поля, которые были в body. Не рекомендуется пытаться изменить поля **id** и **createdAt**
+  - Ответ: новый `Product`, с учётом изменений.
+- Создание товара
+  - Запрос
+    - **URL** `POST <BASE_URL>/{productId}`
+    - **Body**. В тело запроса можно отправить любой набор полей из `Product`, кроме id. Если в **body** не будут указаны какие-то поля из `Product`, то они сгенерируется автоматически и рандомно. Поэтому лучше передавать все поля, кроме id и в целом можно пренебречь image.
+  - Ответ: новый `Product`.
+- Удаление товара `DELETE <BASE_URL>/{productId}`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## ✅ Функциональные требования
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- Отображение списка товаров в виде сетки (название, описание, цена, рейтинг в виде звёздочек и изображение, если есть)
+- Первоначальная загрузка товаров из API GET-запросом с параметрами пагинации `?page=1&limit=10`
+- **Поиск товаров по имени**
+  - Инпут для поиска по названию
+  - При изменении значения отправляется запрос с `?name=...`
+  - Результаты обновляются с задержкой в 500-1000мс
+- **Infinite scroll** — при прокрутке вниз догружаются новые товары
+- **Создание товара**
+  - Модальное окно
+  - Форма добавления нового товара с валидацией
+    - **name**: 3-15 символов
+    - **description**: 10-100 символов
+    - **price**: строка в формате "000.00"
+    - **rating**: целое число от 1 до 10
+  - значение **createdAt** фронт должен сам сформировать из текущего времени
+  - значение **rating** надо умножить на 10 перед отправкой
+  - POST-запрос
+- **Редактирование товара**
+  - Модальное окно
+  - Можно изменить поля name, description, price, rating
+  - Валидация такая же как и при создании товара
+  - PUT-запрос
+- **Удаление товара**
+  - Кнопка удаления + подтверждение (по желанию)
+  - DELETE-запрос на API
+- Отображение лоадеров при загрузке данных
+- Обработка ошибок (например, при падении API)
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 🧩 Нефункциональные требования
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 🔧 Производительность
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- Эффективная подгрузка данных (без дублирующих запросов)
+- Дебаунс поиска
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 🎨 UI/UX
 
-## Learn More
+- Удобный инпут для поиска
+- Простой, но приятный интерфейс
+- Адаптивность под устройства с размером экрана начиная от 1024x768
+- Состояния загрузки, пустого списка, ошибок и т.д.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 🛡 Поддерживаемость и качество кода
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- Читаемый и понятный код
+- Стандартизованный стиль (Prettier + ESLint + Stylelint — по желанию)
+- Названия переменных и компонентов — осмысленные
+- Комментарии — только по делу
 
-### Code Splitting
+### 🔐 Безопасность
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- Санитизация и валидация данных в формах и в поиске
+- Обработка ошибок запроса
 
-### Analyzing the Bundle Size
+### 🚀 CI/CD
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+- Деплой проекта на Vercel / Netlify / GitHub Pages
 
-### Making a Progressive Web App
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## 🛠 Технологии
 
-### Advanced Configuration
+- **React**
+- Если понадобится менеджер состояния, то выбор между: **Zustand**, **MobX**, **React Context API**.
+- Стили через **CSS Modules**
+- Любая библиотека запросов: **Axios**, **Fetch**
+- UI-kit: **MUI**, **Ant Design**, **Chakra UI** и др., но не Tailwind-решения
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+---
 
-### Deployment
+## 📤 Что нужно сдать
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+- Ссылка на репозиторий (GitHub)
+- Краткое описание проекта в `README.md`
+- Ссылка на демо (Netlify, Vercel и т.п.)
 
-### `npm run build` fails to minify
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## ✨ Бонусы (необязательно, но круто)
+
+- Адаптивная верстка для мобилок
+- Tanstack React Query для запросов и хранения данных из API
+- Возможность сортировки через API (`GET <BASE_URL>?sortBy={fieldName}&order={asc|desc}`, по умолчанию **order=asc**)
+
+---
+
+Если что-то непонятно, то не стесняйся задавать вопросы. Помни, что самый глупый вопрос — незаданный 😎
+
+Happy hacking! 👨‍💻
