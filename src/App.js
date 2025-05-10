@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ProductList from './components/ProductList'
 import ProductForm from './components/ProductForm'
-import Input from './components/UI/input/Input'
-import Button from './components/UI/button/Button'
+import Search from './components/Search'
 
 export default function App() {
 	const [products, setProducts] = useState([])
@@ -10,19 +9,15 @@ export default function App() {
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState(null)
 
-	const searchedProducts = useMemo(() => {
-		return products.filter(p =>
-			p.name.toLowerCase().includes(searchQuery.toLowerCase())
-		)
-	}, [searchQuery, products])
-
 	useEffect(() => {
 		setLoading(true)
 		async function fetchProducts() {
 			try {
-				const response = await fetch(
-					`${process.env.REACT_APP_BASE_URL}?page=1&limit=10`
-				)
+				const url = searchQuery
+					? `${process.env.REACT_APP_BASE_URL}?name=${searchQuery}`
+					: `${process.env.REACT_APP_BASE_URL}?page=1&limit=10`
+
+				const response = await fetch(url)
 
 				if (!response.ok) {
 					throw new Error('Failed to fetch data')
@@ -40,7 +35,7 @@ export default function App() {
 			}
 		}
 		fetchProducts()
-	}, [])
+	}, [searchQuery])
 
 	function addProduct(product) {
 		setProducts([...products, product])
@@ -59,28 +54,11 @@ export default function App() {
 				width: '100%',
 			}}
 		>
-			<div
-				style={{
-					display: 'flex',
-					alignItems: 'center',
-					width: '100%',
-					gap: '0.5rem',
-					marginBottom: '1rem',
-				}}
-			>
-				<Input
-					type='text'
-					placeholder='Search...'
-					value={searchQuery}
-					onChange={e => setSearchQuery(e.target.value)}
-					style={{ width: '300px' }}
-				/>
-				<Button>Add New Product</Button>
-			</div>
+			<Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 			{loading && <p>Loading Products...</p>}
 			{error && <p>{error}</p>}
 
-			<ProductList products={searchedProducts} remove={removeProduct} />
+			<ProductList products={products} remove={removeProduct} />
 			<ProductForm add={addProduct} />
 		</div>
 	)
