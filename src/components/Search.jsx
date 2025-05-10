@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react'
 import Input from './UI/input/Input'
-import Button from './UI/button/Button'
 
 export default function Search({ searchQuery, setSearchQuery }) {
 	const debouncedSearch = useCallback(
@@ -35,7 +34,6 @@ export default function Search({ searchQuery, setSearchQuery }) {
 				onChange={handleSearch}
 				style={{ width: '300px' }}
 			/>
-			<Button>Add New Product</Button>
 		</div>
 	)
 }
