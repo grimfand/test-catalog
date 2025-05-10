@@ -55,8 +55,21 @@ export default function App() {
 		setProducts([...products, product])
 	}
 
-	function removeProduct(product) {
-		setProducts(products.filter(p => p.id !== product.id))
+	async function removeProduct(product) {
+		try {
+			const response = await fetch(`${process.env.REACT_APP_BASE_URL}/${product.id}`, {
+				method: 'DELETE'
+			});
+
+			if (!response.ok) {
+				throw new Error('Ошибка при удалении продукта');
+			}
+
+			setProducts(products.filter(p => p.id !== product.id));
+		} catch (error) {
+			console.error('Ошибка:', error);
+			setError('Ошибка при удалении продукта');
+		}
 	}
 
 	const handleScroll = useCallback(() => {
